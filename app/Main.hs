@@ -8,6 +8,7 @@ import Data.Maybe
 main :: IO ()
 main = do
     putStrLn $ show (compress "belle echelle !")
+    let encoded = compress "belle echelle !" in putStrLn $ show (uncompress encoded)
     -- putStrLn $ show (findIndex (\x -> x == "le") ["b","e","l"])
     -- putStrLn $ show (firstChar)
     -- putStrLn $ show (newStr)
