@@ -36,7 +36,7 @@ uncompressRec [] _ acc = acc
 uncompressRec encoded dict acc
     | isNothing acc = Nothing
     | length dict <= firstVal = Nothing -- (n,x) but the nth entry is not found in the dict
-    | firstVal /= 0 = uncompressRec (tail encoded) (dict ++ [(dict !! firstVal)] ++ [[firstChar]]) (Just ((fromJust acc) ++ (dict !! firstVal) ++ [firstChar])) -- New string
+    | firstVal /= 0 = uncompressRec (tail encoded) (dict ++ [(dict !! firstVal) ++ [firstChar]]) (Just ((fromJust acc) ++ (dict !! firstVal) ++ [firstChar])) -- New string
     | isNothing (findIndex (\x -> x == [firstChar]) dict) = uncompressRec (tail encoded) (dict ++ [[firstChar]]) (Just((fromJust acc) ++ [firstChar])) -- New char that is not already in the dict
     | otherwise = Nothing -- New char x: (0,x) but and x is already in dict
     where
