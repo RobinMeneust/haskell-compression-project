@@ -22,11 +22,11 @@ compressRec :: String -> Dictionary -> String -> [(Int, Char)] -> [(Int, Char)]
 compressRec "" _ _ acc = acc
 compressRec text dict maxStr acc = 
     if isNothing index 
-        then compressRec (tail text) ((newStr):dict) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
-        else compressRec (tail text) dict (maxStr ++ [firstChar]) acc -- If it's in the dict we add the char to the string to be searched in the dict
+        then compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
+        else compressRec (tail text) dict newStr acc -- If it's in the dict we add the char to the string to be searched in the dict
     where
         firstChar = head text
-        index = findIndex (\x -> x == (maxStr ++ [firstChar])) dict
         newStr = maxStr ++ [firstChar]
+        index = findIndex (\x -> x == newStr) dict
         prevStepIndex = if maxStr == "" then Nothing else findIndex (\x -> x == maxStr) dict
-        newIndex = if isNothing prevStepIndex then ((length dict) + 1) else fromJust prevStepIndex
+        newIndex = if isNothing prevStepIndex then 0 else fromJust prevStepIndex
