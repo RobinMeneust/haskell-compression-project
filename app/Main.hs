@@ -1,14 +1,16 @@
 module Main (main) where
 
-import LZ.LZ78
+import LZ.LZ78 as LZ78
+import LZ.LZW as LZW
 
 import Data.List
 import Data.Maybe
 
 main :: IO ()
 main = do
-    putStrLn $ show (compress "belle echelle !")
-    let encoded = compress "belle echelle !" in putStrLn $ show (uncompress encoded)
+    putStrLn $ show (LZ78.compress "belle echelle !")
+    let encoded = LZ78.compress "belle echelle !" in putStrLn $ show (LZ78.uncompress encoded)
+    putStrLn $ show (LZW.compress "belle echelle !")
     -- putStrLn $ show (findIndex (\x -> x == "le") ["b","e","l"])
     -- putStrLn $ show (firstChar)
     -- putStrLn $ show (newStr)
