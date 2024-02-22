@@ -20,10 +20,10 @@ uncompress encoded = uncompressRec encoded empty (Just "")
 
 compressRec :: String -> Dictionary -> String -> [(Int, Char)] -> [(Int, Char)]
 compressRec "" _ _ acc = acc
-compressRec text dict maxStr acc = 
-    if isNothing index 
-        then compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
-        else compressRec (tail text) dict newStr acc -- If it's in the dict we add the char to the string to be searched in the dict
+compressRec text dict maxStr acc
+	| isNothing index = compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
+    | length text > 1 = compressRec (tail text) dict newStr acc -- If it's in the dict we add the char to the string to be searched in the dict
+	| otherwise = (acc ++ [(0, firstChar)]) -- If it's in the dict, but it's the last char, so we have to add it (e.g. "aa" becomes [(a,0),(a,0)])
     where
         firstChar = head text
         newStr = maxStr ++ [firstChar]
@@ -38,7 +38,7 @@ uncompressRec encoded dict acc
     | length dict <= firstVal = Nothing -- (n,x) but the nth entry is not found in the dict
     | firstVal /= 0 = uncompressRec (tail encoded) (dict ++ [(dict !! firstVal) ++ [firstChar]]) (Just ((fromJust acc) ++ (dict !! firstVal) ++ [firstChar])) -- New string
     | isNothing (findIndex (\x -> x == [firstChar]) dict) = uncompressRec (tail encoded) (dict ++ [[firstChar]]) (Just((fromJust acc) ++ [firstChar])) -- New char that is not already in the dict
-    | otherwise = Nothing -- New char x: (0,x) but and x is already in dict
+    | otherwise = uncompressRec (tail encoded) dict (Just((fromJust acc) ++ [firstChar])) -- New char x: (0,x) but and x is already in dict (e.g. [(0,a),(0,a)] must give 'aa')
     where
         firstPair = head encoded
         firstVal = fst firstPair
