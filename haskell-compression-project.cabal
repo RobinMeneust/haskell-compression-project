@@ -71,6 +71,7 @@ test-suite haskell-compression-project-test
       LZ.LZ78Spec
       LZ.LZWSpec
       RLESpec
+      Statistic.EncodingTreeSpec
       Statistic.HuffmanSpec
       Statistic.ShannonFanoSpec
       Paths_haskell_compression_project

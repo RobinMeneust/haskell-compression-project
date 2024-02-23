@@ -3,6 +3,7 @@ import LZ.LZWSpec
 import RLESpec
 import Statistic.HuffmanSpec
 import Statistic.ShannonFanoSpec
+import Statistic.EncodingTreeSpec
 
 main :: IO Bool
 main = do
@@ -11,4 +12,5 @@ main = do
     LZ.LZWSpec.runTests
     Statistic.HuffmanSpec.runTests
     Statistic.ShannonFanoSpec.runTests
+    Statistic.EncodingTreeSpec.runTests
   
