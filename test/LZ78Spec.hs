@@ -37,8 +37,11 @@ repetitions_char_gen c = listOf (elements [c])
 repetitions_str :: String -> Int -> String
 repetitions_str str nbRepeat = take nbRepeat (cycle str)
 
--- prop_invalid_input_uncompress :: 
--- prop_invalid_input_uncompress
+prop_uncompress_negative_index :: Bool
+prop_uncompress_negative_index = isNothing $ uncompress [(-1,'a')]
+
+prop_uncompress_too_big_index :: Bool
+prop_uncompress_too_big_index = isNothing $ uncompress [(1,'a')]
 
 
 return []
