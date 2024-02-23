@@ -1,9 +1,9 @@
 {-# LANGUAGE TemplateHaskell #-}
-module LZ78Spec(runTests) where
+module LZ.LZWSpec(runTests) where
 
 import Test.QuickCheck
 
-import LZ.LZ78
+import LZ.LZW
 
 import Data.Maybe
 
@@ -11,8 +11,8 @@ import Data.Maybe
 prop_compress_empty :: Bool
 prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
 
-prop_compress_single_char :: Char -> Bool
-prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c]) == Just [c]
+-- prop_compress_single_char :: Char -> Bool
+-- prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c]) == Just [c]
 
 prop_compress_uncompress :: String -> Bool
 prop_compress_uncompress input =
@@ -38,10 +38,10 @@ repetitions_str :: String -> Int -> String
 repetitions_str str nbRepeat = take nbRepeat (cycle str)
 
 prop_uncompress_negative_index :: Bool
-prop_uncompress_negative_index = isNothing $ uncompress [(-1,'a')]
+prop_uncompress_negative_index = isNothing $ uncompress [(-1)]
 
 prop_uncompress_too_big_index :: Bool
-prop_uncompress_too_big_index = isNothing $ uncompress [(1,'a')]
+prop_uncompress_too_big_index = isNothing $ uncompress [259]
 
 
 return []

@@ -68,8 +68,11 @@ test-suite haskell-compression-project-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      LZ78Spec
+      LZ.LZ78Spec
+      LZ.LZWSpec
       RLESpec
+      Statistic.HuffmanSpec
+      Statistic.ShannonFanoSpec
       Paths_haskell_compression_project
   autogen-modules:
       Paths_haskell_compression_project
