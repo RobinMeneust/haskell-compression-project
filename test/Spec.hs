@@ -1,2 +1,8 @@
-main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+import LZ78Spec
+-- import RLESpec
+
+main :: IO Bool
+main = do
+    LZ78Spec.runTests
+--   RLESpec.runTests
+  
