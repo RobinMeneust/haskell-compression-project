@@ -23,7 +23,7 @@ compressRec "" _ _ acc = acc
 compressRec text dict maxStr acc
 	| isNothing index = compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
     | length text > 1 = compressRec (tail text) dict newStr acc -- If it's in the dict we add the char to the string to be searched in the dict
-	| otherwise = (acc ++ [(0, firstChar)]) -- If it's in the dict, but it's the last char, so we have to add it (e.g. "aa" becomes [(a,0),(a,0)])
+	| otherwise = (acc ++ [((if isNothing prevStepIndex then 0 else fromJust prevStepIndex), firstChar)]) -- If it's in the dict, but it's the last char, so we have to add it (e.g. "aa" becomes [(a,0),(a,0)] and "aaaaa" becomes [(a,0),(a,1),(a,1)])
     where
         firstChar = head text
         newStr = maxStr ++ [firstChar]
