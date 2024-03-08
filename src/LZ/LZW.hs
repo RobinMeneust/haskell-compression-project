@@ -3,7 +3,7 @@
   Description : An implementation of LZW method
   Maintainer  : Jérémy SAELEN
 -}
-module LZ.LZW where
+module LZ.LZW (compress, uncompress) where
 
 import LZ.Dictionaries
 import Data.Maybe
@@ -39,11 +39,9 @@ uncompressRec [] _ acc = acc
 
 uncompressRec encoded dict acc
   | isNothing acc || length dict <= value = Nothing
-  | otherwise = uncompressRec (tail encoded) newDict (Just (fromJust acc ++ character))
+  | otherwise = uncompressRec (tail encoded) newDict (Just (res ++ character))
   where
     value = head encoded
     character = dict !! value
-    newDict = if length (fromJust acc) == 0 then dict else dict ++ [([lastCharacter acc]++[(head character)])]
-
-lastCharacter :: Maybe String -> Char
-lastCharacter str = (fromJust str) !! (length (fromJust str) - 1)
+    res = fromJust acc
+    newDict = if length res == 0 then dict else dict ++ [([last res]++[(head character)])]
