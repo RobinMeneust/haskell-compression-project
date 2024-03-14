@@ -52,7 +52,7 @@ test_RLE input = do
 
 benchmark :: IO ()
 benchmark = do
-    putStrLn "A good compression ratio is big and a good space saving is close to 1"
+    putStrLn "A good compression ratio is big and a good space saving is close to 1. If the space saving is negative then the compression is worst than the original file"
     putStrLn ""
     putStrLn "Starting tests..."
     fileHandle <- openFile "benchmark_input_files/repetitions.txt" ReadMode
