@@ -3,9 +3,10 @@
   Description : An implementation of the run-length encoding method
   Maintainer  : Robin Meneust
 -}
-module RLE(compress, uncompress) where
+module RLE(compress, uncompress, getOutputLength) where
 
 import Data.Maybe
+import Prelude
 
 -- | RLE compress method
 compress :: Eq a => [a] -> [(a, Int)]
@@ -39,3 +40,14 @@ uncompressRec ((symb,occ):list) acc
 	| occ>1 = uncompressRec ((symb,occ-1):list) (acc ++ [symb]) -- We add the character to the output while its number of occurences is greater than 1
 	| occ==1 = uncompressRec list (acc ++ [symb]) -- We only have one occurrence so we add the character only once to the output
 	| otherwise = Nothing -- The number of occurences can't be null or negative
+
+-- | Get size of the compressed data in bytes
+getOutputLength :: [(a, Int)] -> Int
+getOutputLength compressedData = getOutputLengthRec compressedData 0
+
+-- | Get size of the compressed data in bytes with an accumulator
+getOutputLengthRec :: [(a, Int)] -> Int -> Int
+getOutputLengthRec [] acc = acc
+getOutputLengthRec ((_,occ):list) acc = getOutputLengthRec list (acc + nbBytesForOcc)
+	where
+		nbBytesForOcc = (div ((floor . logBase 2.0 . fromIntegral) occ) 8) + 2 -- e.g if occ = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value and we add 1 because we need a separator between each tuple (symb,occ)

@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Benchmark
       Lib
       LZ.Dictionaries
       LZ.LZ78
