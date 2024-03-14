@@ -18,7 +18,12 @@ compress text = compressRec text empty "" []
 uncompress :: [(Int, Char)] -> Maybe String
 uncompress encoded = uncompressRec encoded empty (Just "")
 
-compressRec :: String -> Dictionary -> String -> [(Int, Char)] -> [(Int, Char)]
+-- | LZ78 compress method with accumulator
+compressRec :: String 	-- ^ Text to be compressed
+	-> Dictionary 		-- ^ Dictionary used for the compression
+	-> String			-- ^ Current text section that is in the dictionary (if it's not then we add it to the dictionary and we reset this text section)
+	-> [(Int, Char)]	-- ^ Accumulator, it corresponds to the compressed version of the text that has already been read
+	-> [(Int, Char)]	-- ^ Compressed text
 compressRec "" _ _ acc = acc
 compressRec text dict maxStr acc
 	| isNothing index = compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [(newIndex, firstChar)]) -- If it's not already in dict we can add it
@@ -31,7 +36,12 @@ compressRec text dict maxStr acc
         prevStepIndex = if maxStr == "" then Nothing else findIndex (\x -> x == maxStr) dict
         newIndex = if isNothing prevStepIndex then 0 else fromJust prevStepIndex
 
-uncompressRec ::  [(Int, Char)] -> Dictionary -> Maybe String -> Maybe String
+-- | LZ78 uncompress method with accumulator
+-- If input cannot be uncompressed, returns `Nothing`
+uncompressRec :: [(Int, Char)]	-- ^ Compressed data to be uncompressed
+	-> Dictionary 				-- ^ Dictionary used to uncompress te data
+	-> Maybe String				-- ^ Accumulator, it corresponds to the uncompressed version of the data that has already been read
+	-> Maybe String				-- ^ Uncompressed data
 uncompressRec [] _ acc = acc
 uncompressRec encoded dict acc
     | isNothing acc = Nothing

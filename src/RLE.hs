@@ -16,7 +16,12 @@ compress input = compressRec input Nothing 0 []
 uncompress :: [(a, Int)] -> Maybe [a]
 uncompress input = uncompressRec input []
 
-compressRec :: Eq a => [a] -> Maybe a -> Int -> [(a, Int)] -> [(a, Int)]
+-- | RLE compress method using an accumulator
+compressRec :: Eq a => [a] 	-- ^ Data to be compressed
+	-> Maybe a				-- ^ Previous symbol read (Nothing if it's the first to be read)
+	-> Int					-- ^ Number of occurences of the previous symbol (0 if the previous symbol is Nothing (first iteration))
+	-> [(a, Int)]			-- ^ Accumulator, it corresponds to the compressed version of the data that has already been read
+	-> [(a, Int)]			-- ^ Compressed data
 compressRec input prevSymb nbOcc acc
 	| length input == 0 = if nbOcc>=1 then (acc ++ [((fromJust prevSymb),nbOcc)]) else acc -- End. If the last pair was not added we add it now
 	| isNothing prevSymb && length input == 1 = [(currentSymb, 1)] -- first iteration and only one character
@@ -26,9 +31,11 @@ compressRec input prevSymb nbOcc acc
 	where
 		currentSymb = head input
 
+-- | RLE uncompress method using an accumulator
+-- If input cannot be uncompressed, returns `Nothing`
 uncompressRec :: [(a, Int)] -> [a] -> Maybe [a]
 uncompressRec [] acc = Just acc
 uncompressRec ((symb,occ):list) acc
-	| occ>1 = uncompressRec ((symb,occ-1):list) (acc ++ [symb])
-	| occ==1 = uncompressRec list (acc ++ [symb])
-	| otherwise = Nothing
+	| occ>1 = uncompressRec ((symb,occ-1):list) (acc ++ [symb]) -- We add the character to the output while its number of occurences is greater than 1
+	| occ==1 = uncompressRec list (acc ++ [symb]) -- We only have one occurrence so we add the character only once to the output
+	| otherwise = Nothing -- The number of occurences can't be null or negative
