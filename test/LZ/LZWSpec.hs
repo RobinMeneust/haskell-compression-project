@@ -14,6 +14,13 @@ prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
 -- prop_compress_single_char :: Char -> Bool
 -- prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c]) == Just [c]
 
+prop_compress_line_breaks :: Bool
+prop_compress_line_breaks = uncompress (compress "a\nb\n\nc\n") == Just "a\nb\n\nc\n"
+
+prop_compress_special_characters :: Bool
+prop_compress_special_characters = uncompress (compress "\0\5\123e\a@\\") == Just "\0\5\123e\a@\\"
+
+
 prop_compress_uncompress :: String -> Bool
 prop_compress_uncompress input =
     isJust output && input == fromJust output
