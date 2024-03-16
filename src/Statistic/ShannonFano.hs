@@ -11,8 +11,6 @@ import Data.List (sortBy)
 import Data.Map(toList)
 import Data.Function (on)
 
- 
-
 -- | Shannon-Fano tree generation
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing  -- Base case: Empty list

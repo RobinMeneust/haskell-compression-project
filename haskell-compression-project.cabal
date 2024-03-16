@@ -75,6 +75,7 @@ test-suite haskell-compression-project-test
       Statistic.EncodingTreeSpec
       Statistic.HuffmanSpec
       Statistic.ShannonFanoSpec
+      Statistic.SourceSpec
       Paths_haskell_compression_project
   autogen-modules:
       Paths_haskell_compression_project

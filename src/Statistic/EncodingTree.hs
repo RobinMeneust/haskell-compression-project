@@ -1,70 +1,62 @@
 {- |
   Module : Statistic.EncodingTree
   Description : A module representing a binary tree for binary encoding
-  Maintainer : ???
+  Maintainer : Robin Meneust, (Add the other authors name here)
 -}
 module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress) where
-
 import Statistic.Bit
 import Data.Maybe
-
 data EncodingTree a = EncodingNode Int (EncodingTree a) (EncodingTree a)
                     | EncodingLeaf Int a
   deriving (Eq, Show)
-
 -- | Is the encoding a mere leaf ?
 isLeaf :: EncodingTree a -> Bool
 isLeaf (EncodingLeaf _ _) = True
 isLeaf  _                 = False
-
 -- | The length of the underlying source
 count :: EncodingTree a -> Int
 count (EncodingLeaf cnt _  ) = cnt
 count (EncodingNode cnt _ _) = cnt
-
 -- | Search for symbol in encoding tree
--- has: Recursively checks if a given symbol exists in the encoding tree.
 has :: Eq a => EncodingTree a -> a -> Bool
-has (EncodingLeaf _ x) target = x == target
-has (EncodingNode _ left right) target = has left target || has right target
-
+(EncodingLeaf cnt a) `has` b = a == b
+(EncodingNode cnt left right) `has` b = left `has` b || right `has` b
 -- | Computes the binary code of symbol using encoding tree
 -- If computation is not possible, returns `Nothing`.
--- encode: Finds the binary code of a symbol by traversing the encoding tree. If the symbol is found, it returns the corresponding binary code; otherwise, it returns Nothing.
 encode :: Eq a => EncodingTree a -> a -> Maybe [Bit]
-encode (EncodingLeaf _ _) _ = Just [Zero]  -- Return [Zero] for leaf nodes
-encode (EncodingNode _ left right) target
-    | has left target = case encode left target of
-                              Just bits -> Just (Zero : bits)
-                              Nothing -> Nothing
-    | has right target = case encode right target of
-                               Just bits -> Just (One : bits)
-                               Nothing -> Nothing
-    | otherwise = Nothing
+encode tree symb
+	| tree `has` symb == False = Nothing
+	| otherwise = encodeRec tree symb []
+
+encodeRec :: Eq a => EncodingTree a -> a -> [Bit] -> Maybe [Bit]
+encodeRec (EncodingLeaf _ a) symb acc = if a == symb then Just acc else Nothing
+encodeRec (EncodingNode _ left right) symb acc
+	| left `has` symb = encodeRec left symb (acc++[Zero])
+	| otherwise = encodeRec right symb (acc++[One])
 
 
 -- | Computes the first symbol from list of bits using encoding tree and also returns the list of bits still to process
 -- If computation is not possible, returns `Nothing`.
--- decodeOnce: Decodes the first symbol from a list of bits using the encoding tree and returns the remaining bits. If decoding is not possible, it returns Nothing.
 decodeOnce :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
-decodeOnce (EncodingLeaf _ x) bits = Just (x, bits)
-decodeOnce (EncodingNode _ left right) (bit:bits) =
-    if bit == Zero
-        then decodeOnce left bits
-        else decodeOnce right bits
+decodeOnce (EncodingLeaf _ a) bits = Just (a, bits)
+decodeOnce (EncodingNode _ left right) [] = Nothing
+decodeOnce (EncodingNode _ left right) (Zero:bits) = decodeOnce left bits
+decodeOnce (EncodingNode _ left right) (One:bits) = decodeOnce right bits
 decodeOnce _ _ = Nothing
 
 -- | Computes list of symbols from list of bits using encoding tree
--- decode: Decodes the entire list of symbols from a list of bits using the encoding tree. If decoding is not possible at any point, it returns Nothing.
 decode :: EncodingTree a -> [Bit] -> Maybe [a]
-decode tree bits = decode' tree bits []
-    where
-        decode' _ [] acc = Just (reverse acc)
-        decode' _ _ [] = Nothing
-        decode' tree' bits' acc =
-            case decodeOnce tree' bits' of
-                Just (x, remainingBits) -> decode' tree remainingBits (x:acc)
-                Nothing -> Nothing  -- If decoding fails, return Nothing
+decode tree bits = decodeRec tree bits []
+
+decodeRec :: EncodingTree a -> [Bit] -> [a] -> Maybe [a]
+decodeRec tree [] acc = Just acc
+decodeRec tree bits acc
+	| isNothing temp = Nothing
+	| otherwise = decodeRec tree nextBits nextAcc
+	where
+		temp = decodeOnce tree bits
+		nextBits = if isNothing temp then [] else snd (fromJust temp)
+		nextAcc = if isNothing temp then acc else acc++[fst (fromJust temp)]
 
 
 -- | Mean length of the binary encoding
