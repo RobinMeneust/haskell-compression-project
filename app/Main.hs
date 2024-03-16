@@ -1,9 +1,11 @@
 module Main (main) where
 
-import Statistic.EncodingTree
+import Statistic.EncodingTree as EncodingTree
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
+import Statistic.Huffman as Huffman
+import Statistic.ShannonFano as ShannonFano
 
 import Data.List
 import Data.Maybe
@@ -12,8 +14,10 @@ import Benchmark
 
 main :: IO ()
 main = do
-    benchmark
+    -- benchmark
 
+	putStrLn $ show (EncodingTree.compress ShannonFano.tree "abbca")
+	putStrLn $ show (ShannonFano.tree "abbca")
     -- putStrLn $ show (RLE.compress "aaaabbcbbb")
     -- let encoded = RLE.compress "aaaabbcbbb" in putStrLn $ show (RLE.uncompress encoded)
 

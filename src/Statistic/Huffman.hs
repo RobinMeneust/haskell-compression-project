@@ -4,7 +4,7 @@
   Maintainer : Mathis TEMPO
 -}
 
-module Statistic.Huffman (tree, calculateFrequencies) where
+module Statistic.Huffman (tree) where
 
 import Statistic.EncodingTree (EncodingTree(..))
 import Data.List (sortOn, group, sort)
@@ -38,7 +38,3 @@ convertToEncodingTree :: HuffmanTree a -> EncodingTree a
 convertToEncodingTree (Leaf sym freq) = EncodingLeaf freq sym
 convertToEncodingTree (Node left right _) =
   EncodingNode (frequency left + frequency right) (convertToEncodingTree left) (convertToEncodingTree right)
-
--- | Calculation of the frequencies of the characters in the text
-calculateFrequencies :: String -> [(Char, Int)]
-calculateFrequencies = map (\l -> (head l, length l)) . group . sort

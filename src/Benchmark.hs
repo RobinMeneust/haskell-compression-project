@@ -7,7 +7,7 @@ module Benchmark where
 
 import System.IO -- To read files
 import qualified Statistic.EncodingTree as EncodingTree
-import Statistic.Huffman (calculateFrequencies, tree)
+import Statistic.Huffman (tree)
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
@@ -52,7 +52,7 @@ test_RLE input = do
     spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
 
 -- | Compute and show Huffman performance on the given input
-test_Huffman :: String -> IO ()
+{- test_Huffman :: String -> IO ()
 test_Huffman input = do
     let frequencies = calculateFrequencies input
         maybeTree = tree frequencies
@@ -63,7 +63,7 @@ test_Huffman input = do
         spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
     putStrLn $ "Huffman Compression ratio: " ++ show compressionRatio
     putStrLn $ "Huffman Space saving: " ++ show spaceSaving ++ " %"
-    putStrLn ""
+    putStrLn "" -}
 
 benchmark :: IO ()
 benchmark = do
@@ -79,6 +79,6 @@ benchmark = do
       test_LZ78 fileContent
       test_LZW fileContent
       test_RLE fileContent
-      test_Huffman fileContent
+      -- test_Huffman fileContent
       putStrLn ""
       testFiles rest
