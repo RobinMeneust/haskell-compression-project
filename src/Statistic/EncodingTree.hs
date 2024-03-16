@@ -34,13 +34,16 @@ has :: Eq a => EncodingTree a -> a -> Bool
 -- | Computes the binary code of symbol using encoding tree
 -- If computation is not possible, returns `Nothing`.
 encode :: Eq a => EncodingTree a -> a -> Maybe [Bit]
+encode (EncodingLeaf _ b) c
+	| b == c = Just [Zero]
+	| otherwise = Nothing 
 encode tree symb
 	| tree `has` symb == False = Nothing -- If the symbol is not in the tree it's an error
 	| otherwise = encodeRec tree symb []
 
 -- | Computes the binary code of symbol using encoding tree with an accumulator
 encodeRec :: Eq a => EncodingTree a -> a -> [Bit] -> Maybe [Bit]
-encodeRec (EncodingLeaf _ a) symb acc = if a == symb then Just acc else Nothing 
+encodeRec (EncodingLeaf _ b) symb acc = if b == symb then Just acc else Nothing 
 encodeRec (EncodingNode _ left right) symb acc
 	| left `has` symb = encodeRec left symb (acc++[Zero]) 
 	| otherwise = encodeRec right symb (acc++[One]) 
@@ -48,7 +51,7 @@ encodeRec (EncodingNode _ left right) symb acc
 
 -- | Computes the first symbol from list of bits using encoding tree and also returns the list of bits still to process
 decodeOnce :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
-decodeOnce (EncodingLeaf _ a) bits = Just (a, bits)
+decodeOnce (EncodingLeaf _ b) bits = Just (b, bits)
 decodeOnce (EncodingNode _ left right) [] = Nothing 
 decodeOnce (EncodingNode _ left right) (Zero:bits) = decodeOnce left bits 
 decodeOnce (EncodingNode _ left right) (One:bits) = decodeOnce right bits 
@@ -61,9 +64,13 @@ decode tree bits = decodeRec tree bits []
 -- | Computes list of symbols from list of bits using encoding tree with a accumulator
 decodeRec :: EncodingTree a -> [Bit] -> [a] -> Maybe [a]
 decodeRec tree [] acc = Just acc 
+decodeRec (EncodingLeaf c d) (b:bits) acc
+	| b == Zero = decodeRec (EncodingLeaf c d) bits (d:acc)
+	| otherwise = Nothing
+
 decodeRec tree bits acc
-	| isNothing temp = Nothing 
-	| otherwise = decodeRec tree nextBits nextAcc 
+	| isNothing temp = Nothing
+	| otherwise = decodeRec tree nextBits nextAcc
 	where
 		temp = decodeOnce tree bits 
 		nextBits = if isNothing temp then [] else snd (fromJust temp) 
