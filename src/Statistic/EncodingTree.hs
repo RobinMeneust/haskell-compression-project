@@ -9,20 +9,23 @@ import Data.Maybe
 data EncodingTree a = EncodingNode Int (EncodingTree a) (EncodingTree a)
                     | EncodingLeaf Int a
   deriving (Eq, Show)
+
 -- | Is the encoding a mere leaf ?
 isLeaf :: EncodingTree a -> Bool
 isLeaf (EncodingLeaf _ _) = True
 isLeaf  _                 = False
+
 -- | The length of the underlying source
 count :: EncodingTree a -> Int
 count (EncodingLeaf cnt _  ) = cnt
 count (EncodingNode cnt _ _) = cnt
+
 -- | Search for symbol in encoding tree
 has :: Eq a => EncodingTree a -> a -> Bool
 (EncodingLeaf cnt a) `has` b = a == b
 (EncodingNode cnt left right) `has` b = left `has` b || right `has` b
+
 -- | Computes the binary code of symbol using encoding tree
--- If computation is not possible, returns `Nothing`.
 encode :: Eq a => EncodingTree a -> a -> Maybe [Bit]
 encode tree symb
 	| tree `has` symb == False = Nothing
@@ -36,7 +39,6 @@ encodeRec (EncodingNode _ left right) symb acc
 
 
 -- | Computes the first symbol from list of bits using encoding tree and also returns the list of bits still to process
--- If computation is not possible, returns `Nothing`.
 decodeOnce :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
 decodeOnce (EncodingLeaf _ a) bits = Just (a, bits)
 decodeOnce (EncodingNode _ left right) [] = Nothing
@@ -73,7 +75,6 @@ meanLength tree = fromIntegral totalLength / fromIntegral totalCount
       in (totalCnt + cnt, totalLen + leftCnt + rightCnt)
 
 -- | Compress method using a function generating encoding tree and also returns generated encoding tree
--- compress: Compresses a list of symbols using a provided encoder function that generates an encoding tree. It returns the generated encoding tree along with the compressed binary data.
 compress :: Eq a => ([a] -> Maybe (EncodingTree a)) -> [a] -> (Maybe (EncodingTree a), [Bit])
 compress encoder input = case encoder input of
                             Just tree -> let encoded = mapM (encode tree) input
@@ -83,8 +84,72 @@ compress encoder input = case encoder input of
                             _ -> (Nothing, [])
 
 -- | Uncompress method using previously generated encoding tree
--- If input cannot be uncompressed, returns `Nothing`
--- uncompress: Uncompresses binary data using a provided encoding tree. If uncompression is not possible, it returns Nothing.
 uncompress :: Eq a => (Maybe (EncodingTree a), [Bit]) -> Maybe [a]
 uncompress (Just tree, bits) = decode tree bits
 uncompress _ = Nothing
+
+------------------------------------------------------------ code of Mathis ----------------------------------------------------------------
+-- module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress) where
+
+-- import Statistic.Bit
+-- import Data.Maybe (catMaybes)
+-- import Control.Applicative ((<|>))
+
+-- data EncodingTree a = EncodingNode Int (EncodingTree a) (EncodingTree a)
+--                     | EncodingLeaf Int a
+--   deriving (Eq, Show)
+
+-- isLeaf :: EncodingTree a -> Bool
+-- isLeaf (EncodingLeaf _ _) = True
+-- isLeaf _ = False
+
+-- count :: EncodingTree a -> Int
+-- count (EncodingLeaf cnt _) = cnt
+-- count (EncodingNode cnt _ _) = cnt
+
+-- has :: Eq a => EncodingTree a -> a -> Bool
+-- has (EncodingLeaf _ symbol) target = symbol == target
+-- has (EncodingNode _ left right) target = has left target || has right target
+
+-- encode :: Eq a => EncodingTree a -> a -> Maybe [Bit]
+-- encode tree symbol = reverse <$> encodeHelper tree symbol []
+--   where
+--     encodeHelper (EncodingLeaf _ s) target acc = if s == target then Just acc else Nothing
+--     encodeHelper (EncodingNode _ left right) target acc =
+--       (encodeHelper left target (Zero : acc)) <|> (encodeHelper right target (One : acc))
+
+-- decodeOnce :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
+-- decodeOnce tree bits = decodeOnceHelper tree bits
+--   where
+--     decodeOnceHelper (EncodingLeaf _ symbol) remainingBits = Just (symbol, remainingBits)
+--     decodeOnceHelper (EncodingNode _ left right) (bit:bits) =
+--       case bit of
+--         Zero -> decodeOnceHelper left bits
+--         One -> decodeOnceHelper right bits
+--     decodeOnceHelper _ [] = Nothing
+
+-- decode :: EncodingTree a -> [Bit] -> Maybe [a]
+-- decode tree bits = decodeHelper tree bits []
+--   where
+--     decodeHelper _ [] acc = Just (reverse acc)
+--     decodeHelper tree bits acc =
+--       case decodeOnce tree bits of
+--         Just (symbol, remainingBits) -> decodeHelper tree remainingBits (symbol:acc)
+--         Nothing -> Nothing
+
+-- meanLength :: EncodingTree a -> Double
+-- meanLength tree = totalLength tree / fromIntegral (count tree)
+--   where
+--     totalLength (EncodingLeaf weight _) = fromIntegral weight
+--     totalLength (EncodingNode _ left right) = totalLength left + totalLength right
+
+-- compress :: Eq a => ([a] -> Maybe (EncodingTree a)) -> [a] -> (Maybe (EncodingTree a), [Bit])
+-- compress buildTree symbols =
+--   case buildTree symbols of
+--     Just tree -> let encodedSymbols = catMaybes $ map (encode tree) symbols
+--                  in (Just tree, concat encodedSymbols)
+--     Nothing -> (Nothing, [])
+
+-- uncompress :: (Maybe (EncodingTree a), [Bit]) -> Maybe [a]
+-- uncompress (Just tree, bits) = decode tree bits
+-- uncompress (Nothing, _) = Nothing
