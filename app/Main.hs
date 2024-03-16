@@ -14,10 +14,12 @@ import Benchmark
 
 main :: IO ()
 main = do
-    -- benchmark
+    benchmark
 
-	putStrLn $ show (EncodingTree.compress ShannonFano.tree "abbca")
-	putStrLn $ show (ShannonFano.tree "abbca")
+	-- putStrLn $ show (Huffmann.tree "abbca")
+	-- putStrLn $ show (EncodingTree.compress Huffmann.tree "abbca")
+	-- putStrLn $ show (ShannonFano.tree "abbca")
+	-- putStrLn $ show (EncodingTree.compress ShannonFano.tree "abbca")
     -- putStrLn $ show (RLE.compress "aaaabbcbbb")
     -- let encoded = RLE.compress "aaaabbcbbb" in putStrLn $ show (RLE.uncompress encoded)
 

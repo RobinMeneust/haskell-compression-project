@@ -3,7 +3,7 @@
   Description : A module representing a binary tree for binary encoding
   Maintainer : Robin Meneust, Mathis TEMPO
 -}
-module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress, calculateFrequencies) where
+module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress) where
 
 import Statistic.Bit
 
@@ -90,7 +90,3 @@ compress buildTree symbols =
 uncompress :: (Maybe (EncodingTree a), [Bit]) -> Maybe [a]
 uncompress (Just tree, bits) = decode tree bits
 uncompress (Nothing, _) = Nothing
-
--- | Calculation of the frequencies of the characters in the text
-calculateFrequencies :: Ord a => [a] -> [(a, Int)]
-calculateFrequencies = map (\l -> (head l, length l)) . group . sort

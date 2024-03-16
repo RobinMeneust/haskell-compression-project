@@ -10,11 +10,12 @@ import Statistic.Source
 import Data.List (sortBy)
 import Data.Map(toList)
 import Data.Function (on)
+import Statistic.Source(orderedCounts)
 
 -- | Shannon-Fano tree generation
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing  -- Base case: Empty list
-tree symbols = buildTree $ sortBy (flip compare `on` snd) $ calculateFrequencies symbols
+tree symbols = buildTree $ sortBy (flip compare `on` snd) $ orderedCounts symbols
 
 -- | Calculate symbol probabilities
 -- probabilities :: Ord a => [a] -> [(a, Double)]

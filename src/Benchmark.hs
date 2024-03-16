@@ -7,7 +7,8 @@ module Benchmark where
 
 import System.IO -- To read files
 import qualified Statistic.EncodingTree as EncodingTree
-import Statistic.Huffman (tree)
+import Statistic.Huffman as Huffman
+import Statistic.ShannonFano as ShannonFano
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
@@ -51,6 +52,19 @@ test_RLE input = do
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
 
+-- | Compute and show Shannon Fano performance on the given input
+test_ShannonFano :: String -> IO ()
+test_ShannonFano input = do
+    putStrLn $ "Shannon Fano Compression ratio: " ++ show compressionRatio
+    putStrLn $ "Shannon Fano Space saving: " ++ show spaceSaving ++ " %"
+    putStrLn ""
+  where
+    output = EncodingTree.compress ShannonFano.tree input
+    inputSize = length input
+    outputSize = length output -- TODO: change to real size
+    compressionRatio = fromIntegral inputSize / fromIntegral outputSize
+    spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
+
 -- | Compute and show Huffman performance on the given input
 {- test_Huffman :: String -> IO ()
 test_Huffman input = do
@@ -79,6 +93,7 @@ benchmark = do
       test_LZ78 fileContent
       test_LZW fileContent
       test_RLE fileContent
+      test_ShannonFano fileContent
       -- test_Huffman fileContent
       putStrLn ""
       testFiles rest
