@@ -23,7 +23,7 @@ prop_Entropy xs =
         counts = occurrences xs
         totalCount = sum $ Map.elems counts
         probabilities = map (\(_, c) -> fromIntegral c / fromIntegral totalCount) $ Map.toList counts
-        expectedEntropy = negate $ sum [-p * logBase 2 p | p <- probabilities]
+        expectedEntropy = negate $ sum [p * logBase 2 p | p <- probabilities]
     in abs (ent - expectedEntropy) <= 0.00001 -- Tolerance for floating point comparison
 
 -- Property: The orderedCounts function returns a list sorted by counts in descending order

@@ -31,7 +31,7 @@ tree symbols = buildTree $ sortBy (flip compare `on` snd) $ orderedCounts symbol
 -- | Build Shannon-Fano tree recursively
 buildTree :: Ord a => [(a, Int)] -> Maybe (EncodingTree a)
 buildTree [] = Nothing  -- Base case: Empty list
-buildTree [(x, _)] = Just (EncodingLeaf 1 x)  -- Base case: Single symbol
+buildTree [(x, c)] = Just (EncodingLeaf c x)  -- Base case: Single symbol
 buildTree symbols = case (leftTree, rightTree) of
   (Just left, Just right) -> Just (EncodingNode totalCount left right)
   _ -> Nothing
