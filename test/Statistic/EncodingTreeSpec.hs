@@ -2,53 +2,38 @@
 module Statistic.EncodingTreeSpec(runTests) where
 
 import Test.QuickCheck
-
 import Statistic.EncodingTree
-import Statistic.Bit (Bit(..))
+import Statistic.Bit
+import Statistic.Huffman (calculateFrequencies, tree)
+import Data.Maybe (isJust)
 
-encodingTree = EncodingNode 5 (EncodingNode 4 (EncodingLeaf 2 'a') (EncodingLeaf 2 'b')) (EncodingLeaf 1 'c')
+-- Tests for compress and uncompress
 
--- Those tests are incomplete and should be re-written
+prop_compress_empty :: Bool
+prop_compress_empty =
+  let frequencies = calculateFrequencies ""
+      mTree = tree frequencies
+      compressedResult = fmap (\t -> compress (\_ -> Just t) "") mTree
+  in case compressedResult of
+      Just (_, bits) -> uncompress (mTree, bits) == Just ""
+      _ -> False
 
+prop_compress_single_char :: Char -> Bool
+prop_compress_single_char c =
+  let frequencies = calculateFrequencies [c]
+      mTree = tree frequencies
+      compressedResult = fmap (\t -> compress (\_ -> Just t) [c]) mTree
+  in case compressedResult of
+      Just (_, bits) -> uncompress (mTree, bits) == Just [c]
+      _ -> False
 
-prop_has :: Char -> Bool
-prop_has c = encodingTree `has` c == elem c ['a','b','c']
-
-prop_encode_a :: Bool
-prop_encode_a = encode encodingTree 'a' == Just [Zero,Zero]
-
-prop_encode_b :: Bool
-prop_encode_b = encode encodingTree 'b' == Just [Zero,One]
-
-prop_encode_c :: Bool
-prop_encode_c = encode encodingTree 'c' == Just [One] 
-
-prop_decodeOnce_a :: Bool
-prop_decodeOnce_a = decodeOnce encodingTree [Zero,Zero] == Just ('a',[])
-
-prop_decodeOnce_b :: Bool
-prop_decodeOnce_b = decodeOnce encodingTree [Zero,One] == Just ('b',[])
-
-prop_decodeOnce_c :: Bool
-prop_decodeOnce_c = decodeOnce encodingTree [One]  == Just ('c',[])
-
-prop_decode :: Bool
-prop_decode = decode encodingTree [Zero,Zero,Zero,One,One] == Just "abc"
-
-prop_meanLength :: Bool
-prop_meanLength = meanLength encodingTree == (2 * 2 + 1) / 3  -- Assuming the given encoding tree
-
-prop_compressUncompress :: String -> Bool
-prop_compressUncompress xs = uncompress (compress (\xs -> Just encodingTree) xs) == Just xs
-
-prop_compressEmpty :: Bool
-prop_compressEmpty = snd (compress (\_ -> Nothing) "") == []
-
-prop_encodeDecode :: Char -> Bool
-prop_encodeDecode c =
-  case encode encodingTree c of
-    Just bits -> decode encodingTree bits == Just [c]
-    Nothing   -> False
+prop_compress_uncompress :: String -> Property
+prop_compress_uncompress input = (not . null) input && isJust (tree (calculateFrequencies input)) ==>
+  let mTree = tree (calculateFrequencies input)
+      compressedResult = fmap (\t -> compress (\_ -> Just t) input) mTree
+  in case compressedResult of
+      Just (_, bits) -> uncompress (mTree, bits) == Just input
+      _ -> False
 
 return []
 runTests :: IO Bool

@@ -1,3 +1,9 @@
+{- |
+  Module : Statistic.Huffman
+  Description : A module containing specifics for the Huffman compression method
+  Maintainer : Mathis TEMPO
+-}
+
 module Statistic.Huffman (tree, calculateFrequencies) where
 
 import Statistic.EncodingTree (EncodingTree(..))
@@ -5,39 +11,34 @@ import Data.List (sortOn, group, sort)
 
 data HuffmanTree a = Leaf a Int | Node (HuffmanTree a) (HuffmanTree a) Int deriving (Show)
 
--- | Génération de l'arbre Huffman à partir d'une liste de fréquences
+-- | generation of the huffman tree based on a list of frequencies
 tree :: Ord a => [(a, Int)] -> Maybe (EncodingTree a)
 tree [] = Nothing
 tree xs = Just $ convertToEncodingTree $ buildTree $ map (\(sym, freq) -> Leaf sym freq) xs
 
--- | Construction de l'arbre Huffman
+-- | Building the tree
 buildTree :: Ord a => [HuffmanTree a] -> HuffmanTree a
+buildTree [] = error "buildTree called with an empty list"
 buildTree [node] = node
 buildTree nodes =
   let sortedNodes = sortOn frequency nodes
-      (node1:node2:rest) = sortedNodes
-      newNode = Node node1 node2 (frequency node1 + frequency node2)
-  in buildTree (newNode : rest)
+  in case sortedNodes of
+       (node1:node2:rest) ->
+         let newNode = Node node1 node2 (frequency node1 + frequency node2)
+         in buildTree (newNode : rest)
+       _ -> error "Unexpected pattern in buildTree"
 
--- | Insertion d'un noeud dans une liste de HuffmanTree, triée par fréquence
-insertNode :: Ord a => HuffmanTree a -> [HuffmanTree a] -> [HuffmanTree a]
-insertNode node [] = [node]
-insertNode node (x:xs)
-  | frequency node <= frequency x = node : x : xs
-  | otherwise = x : insertNode node xs
-
--- | Récupération de la fréquence d'un HuffmanTree
+-- | definition of the frequency
 frequency :: HuffmanTree a -> Int
 frequency (Leaf _ f) = f
 frequency (Node _ _ f) = f
 
--- | Conversion d'un HuffmanTree en EncodingTree
+-- | Converting HuffmanTree in an EncodingTree
 convertToEncodingTree :: HuffmanTree a -> EncodingTree a
 convertToEncodingTree (Leaf sym freq) = EncodingLeaf freq sym
 convertToEncodingTree (Node left right _) =
   EncodingNode (frequency left + frequency right) (convertToEncodingTree left) (convertToEncodingTree right)
 
--- | Calcul des fréquences des caractères dans une chaîne
+-- | Calculation of the frequencies of the characters in the text
 calculateFrequencies :: String -> [(Char, Int)]
 calculateFrequencies = map (\l -> (head l, length l)) . group . sort
-
