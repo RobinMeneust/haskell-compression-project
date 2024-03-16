@@ -11,6 +11,12 @@ import Data.Maybe
 prop_compress_empty :: Bool
 prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
 
+prop_compress_line_breaks :: Bool
+prop_compress_line_breaks = compress "a\nb\n\nc\n" == [(0,'a'),(0,'\n'),(0,'b'),(2,'\n'),(0,'c'),(0,'\n')] && uncompress (compress "a\nb\n\nc\n") == Just "a\nb\n\nc\n"
+
+prop_compress_special_characters :: Bool
+prop_compress_special_characters = compress "\0\5\123e\a@\0\\" == [(0,'\0'),(0,'\5'),(0,'\123'),(0,'e'),(0,'\a'),(0,'@'), (1,'\\')] && uncompress (compress "\0\5\123e\a@\\") == Just "\0\5\123e\a@\\"
+
 prop_compress_single_char :: Char -> Bool
 prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c]) == Just [c]
 

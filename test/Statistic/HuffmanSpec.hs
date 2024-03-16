@@ -2,42 +2,34 @@
 module Statistic.HuffmanSpec(runTests) where
 
 import Test.QuickCheck
+import Statistic.Huffman (calculateFrequencies, tree)
+import Statistic.EncodingTree (EncodingTree(..), count)
+import Data.List (nub, sort)
+import Control.Monad (liftM2)
 
-import Statistic.Huffman
+-- Ensure that calculateFrequencies return the right frequencies for a given string
+prop_calculateFrequencies_correctness :: String -> Property
+prop_calculateFrequencies_correctness str =
+  let frequencies = calculateFrequencies str
+      correct = all (\(c, freq) -> freq == length (filter (== c) str)) frequencies
+  in collect (length str) $ correct
 
-import Data.Maybe
+-- ensure that the built Huffman tree has the right amount of leaf for unical characters
+prop_tree_correctness :: [Char] -> Property
+prop_tree_correctness str = not (null str) ==>
+  let freqs = calculateFrequencies str
+      mTree = tree freqs
+      totalFreq = sum $ map snd freqs
+      numLeaves = length $ nub str
+  in case mTree of
+       Just t -> let freq = count t
+                     leaves = countLeaves t
+                 in freq === totalFreq .&&. leaves === numLeaves
+       Nothing -> property False
 
--- WILL DEPEND ON THE INPUT/OUTPUT OF THE (UN)COMPRESS FUNCTIONS
-
--- prop_compress_empty :: Bool
--- prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
-
--- prop_compress_single_char :: Char -> Bool
--- prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c]) == Just [c]
-
--- prop_compress_uncompress :: String -> Bool
--- prop_compress_uncompress input =
---     isJust output && input == fromJust output
---     where
---         output = uncompress (compress input)
-
--- prop_compress_uncompress_char_repetitions :: Char -> Property
--- prop_compress_uncompress_char_repetitions c =
--- 	forAll (repetitions_char_gen c) $ \input -> let output = uncompress (compress input) in isJust output && input == fromJust output
-
--- prop_compress_uncompress_str_repetitions :: String -> Int -> Property
--- prop_compress_uncompress_str_repetitions s nbRepeat =
--- 	length s > 0 ==> isJust output && input == fromJust output
--- 	where
--- 		input = repetitions_str s nbRepeat
--- 		output = uncompress (compress input)
-
--- repetitions_char_gen :: Char -> Gen String
--- repetitions_char_gen c = listOf (elements [c])
-
--- repetitions_str :: String -> Int -> String
--- repetitions_str str nbRepeat = take nbRepeat (cycle str)
-
+countLeaves :: EncodingTree a -> Int
+countLeaves (EncodingLeaf _ _) = 1
+countLeaves (EncodingNode _ l r) = countLeaves l + countLeaves r
 
 return []
 runTests :: IO Bool
