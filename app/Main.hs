@@ -15,12 +15,19 @@ import Benchmark
 
 main :: IO ()
 main = do
+	-- putStrLn $ show (LZW.removeSpecialCharacters "\0\5000\123e@\\" "")
+	-- putStrLn $ show (LZW.compress "\0\5000\123e@\\")
+	-- putStrLn $ show (LZW.uncompress (LZW.compress "\0\5000\123e\a@\\"))
+	putStrLn $ show (LZW.compress "aaaaaaaaaa")
+	putStrLn $ show (LZW.uncompress (LZW.compress "aaaaaaaaaa"))
+	putStrLn $ show (LZW.compress "abababab")
+	putStrLn $ show (LZW.uncompress (LZW.compress "abababab"))
     -- benchmark
 	-- putStrLn $ show (Source.entropy "abbca")
 	-- .putStrLn $ show (Huffmann.tree "abbca")
 	-- putStrLn $ show (EncodingTree.compress Huffmann.tree "abbca")
-	putStrLn $ show (ShannonFano.tree "abbca")
-	putStrLn $ show (EncodingTree.compress ShannonFano.tree "a")
+	-- putStrLn $ show (ShannonFano.tree "abbca")
+	-- putStrLn $ show (EncodingTree.compress ShannonFano.tree "a")
     -- putStrLn $ show (RLE.compress "aaaabbcbbb")
     -- let encoded = RLE.compress "aaaabbcbbb" in putStrLn $ show (RLE.uncompress encoded)
 
@@ -28,7 +35,7 @@ main = do
     -- let encoded = LZ78.compress "belle echelle !" in putStrLn $ show (LZ78.uncompress encoded)
 
     -- let tree = EncodingNode 5 (EncodingNode 4 (EncodingLeaf 2 'a') (EncodingLeaf 2 'b')) (EncodingLeaf 1 'c') in putStrLn $ show (encode tree 'a')
-    -- putStrLn $ show (LZW.compress "belle echelle !")
+    -- putStrLn $ show (LZW.compress "belle echelle")
     -- putStrLn $ show (findIndex (\x -> x == "le") ["b","e","l"])
     -- putStrLn $ show (firstChar)
     -- putStrLn $ show (newStr)

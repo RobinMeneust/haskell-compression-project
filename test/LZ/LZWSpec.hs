@@ -7,6 +7,9 @@ import LZ.LZW
 
 import Data.Maybe
 
+import Data.Char
+
+import Data.List
 
 prop_compress_empty :: Bool
 prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
@@ -17,29 +20,31 @@ prop_compress_empty = compress "" == [] && uncompress (compress "") == Just ""
 prop_compress_line_breaks :: Bool
 prop_compress_line_breaks = uncompress (compress "a\nb\n\nc\n") == Just "a\nb\n\nc\n"
 
+-- LZW can't compress/decompress character with a value greater than 255 (\1000 for instance) so it muste return Nothing
 prop_compress_special_characters :: Bool
-prop_compress_special_characters = uncompress (compress "\0\5\123e\a@\\") == Just "\0\5\123e\a@\\"
+prop_compress_special_characters = uncompress (compress "\0\5000\123e\a@\\") == Just ("\0\\5000\123e\a@\\")
 
 
-prop_compress_uncompress :: String -> Bool
+prop_compress_uncompress :: String -> Property
 prop_compress_uncompress input =
-    isJust output && input == fromJust output
+	length input > 0 && isNothing (find (\c -> ord c > 255) input) ==> isJust output && input == fromJust output
     where
         output = uncompress (compress input)
 
-prop_compress_uncompress_char_repetitions :: Char -> Property
-prop_compress_uncompress_char_repetitions c =
-	forAll (repetitions_char_gen c) $ \input -> let output = uncompress (compress input) in isJust output && input == fromJust output
+prop_compress_uncompress_char_repetitions :: Property
+prop_compress_uncompress_char_repetitions =
+	forAll generate_repetitions_char_ascii $ \input -> let output = uncompress (compress input) in isJust output && input == fromJust output
 
 prop_compress_uncompress_str_repetitions :: String -> Int -> Property
 prop_compress_uncompress_str_repetitions s nbRepeat =
-	length s > 0 ==> isJust output && input == fromJust output
+	length s > 0 && isNothing (find (\c -> ord c > 255) s) ==> isJust output && input == fromJust output
 	where
 		input = repetitions_str s nbRepeat
 		output = uncompress (compress input)
 
-repetitions_char_gen :: Char -> Gen String
-repetitions_char_gen c = listOf (elements [c])
+generate_repetitions_char_ascii :: Gen String
+generate_repetitions_char_ascii = listOf (elements ['\0'..'\255'])
+
 
 repetitions_str :: String -> Int -> String
 repetitions_str str nbRepeat = take nbRepeat (cycle str)
