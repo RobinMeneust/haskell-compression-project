@@ -3,7 +3,7 @@
   Description : An implementation of LZW method
   Maintainer  : Jérémy SAELEN
 -}
-module LZ.LZW (compress, uncompress, removeSpecialCharacters) where
+module LZ.LZW (compress, uncompress) where
 
 import LZ.Dictionaries
 import Data.Maybe
@@ -59,17 +59,15 @@ uncompressRec :: [Int]  -- ^ Compressed data to be uncompressed
 uncompressRec [] _ acc _ = acc
 
 uncompressRec (value:encoded) dict acc previousValue
-    | isNothing acc || length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = Nothing -- If it cannot be uncompressed
+    | isNothing acc || length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = acc -- If it cannot be uncompressed
     | otherwise = uncompressRec encoded newDict (Just (res ++ character)) value -- If it can be uncompressed
     where
-        character = if value < (length dict) 
-                then dict !! value
-                else (dict !! previousValue) ++ (last [(dict !! previousValue)])
+        character = newDict !! value
         res = fromJust acc
         lastCharacter = last res
         newDict = if length res == 0 
                 then dict 
                 else if value < (length dict) 
-                    then dict ++ [([lastCharacter]++[(head character)])] 
-                    else dict ++ [([lastCharacter]++[head character])] ++ [([lastCharacter]++(character))]
+                    then dict ++ [([lastCharacter]++[head character])] 
+                    else dict ++ [((dict !! previousValue) ++ [head character])] --  ++ [([lastCharacter]++(character))]
 
