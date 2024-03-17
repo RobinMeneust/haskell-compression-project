@@ -48,6 +48,6 @@ getOutputLength compressedData = getOutputLengthRec compressedData 0
 -- | Get size of the compressed data in bytes with an accumulator
 getOutputLengthRec :: [(a, Int)] -> Int -> Int
 getOutputLengthRec [] acc = acc
-getOutputLengthRec ((_,occ):list) acc = getOutputLengthRec list (acc + nbBytesForOcc)
+getOutputLengthRec ((_,occ):list) acc = getOutputLengthRec list (acc + nbBytesForOcc + 2) -- size symbol + size occ in bytes + separator between tuples (symb, occ)
 	where
-		nbBytesForOcc = (div ((floor . logBase 2.0 . fromIntegral) occ) 8) + 2 -- e.g if occ = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value and we add 1 because we need a separator between each tuple (symb,occ)
+		nbBytesForOcc = (div ((floor . logBase 2.0 . fromIntegral) occ) 8) + 1 -- e.g if occ = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value

@@ -3,7 +3,7 @@
   Description : An implementation of LZ78 method
   Maintainer  : Robin Meneust
 -}
-module LZ.LZ78(compress, uncompress) where
+module LZ.LZ78(compress, uncompress, getOutputLength) where
 
 import LZ.Dictionaries
 import Data.Maybe
@@ -55,4 +55,15 @@ uncompressRec encoded dict acc
         firstVal = fst firstPair
         firstChar = snd firstPair
 
-        
+
+
+-- | Get size of the compressed data in bytes
+getOutputLength :: [(Int, Char)] -> Int
+getOutputLength compressedData = getOutputLengthRec compressedData 0
+
+-- | Get size of the compressed data in bytes with an accumulator
+getOutputLengthRec :: [(Int, Char)] -> Int -> Int
+getOutputLengthRec [] acc = acc
+getOutputLengthRec ((index,_):list) acc = getOutputLengthRec list (acc + nbBytesForIndex + 2) -- size char + size dict index + separator between tuples (index, char)
+	where
+		nbBytesForIndex = (div ((floor . logBase 2.0 . fromIntegral) index) 8) + 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value

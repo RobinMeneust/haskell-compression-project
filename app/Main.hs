@@ -15,14 +15,15 @@ import Benchmark
 
 main :: IO ()
 main = do
+    benchmark
+	
 	-- putStrLn $ show (LZW.removeSpecialCharacters "\0\5000\123e@\\" "")
 	-- putStrLn $ show (LZW.compress "\0\5000\123e@\\")
 	-- putStrLn $ show (LZW.uncompress (LZW.compress "\0\5000\123e\a@\\"))
-	putStrLn $ show (LZW.compress "aaaaaaaaaa")
-	putStrLn $ show (LZW.uncompress (LZW.compress "aaaaaaaaaa"))
-	putStrLn $ show (LZW.compress "abababab")
-	putStrLn $ show (LZW.uncompress (LZW.compress "abababab"))
-    -- benchmark
+	-- putStrLn $ show (LZW.compress "aaaaaaaaaa")
+	-- putStrLn $ show (LZW.uncompress (LZW.compress "aaaaaaaaaa"))
+	-- putStrLn $ show (LZW.compress "abababab")
+	-- putStrLn $ show (LZW.uncompress (LZW.compress "abababab"))
 	-- putStrLn $ show (Source.entropy "abbca")
 	-- .putStrLn $ show (Huffmann.tree "abbca")
 	-- putStrLn $ show (EncodingTree.compress Huffmann.tree "abbca")

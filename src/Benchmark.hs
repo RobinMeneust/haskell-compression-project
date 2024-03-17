@@ -17,67 +17,67 @@ import LZ.LZW as LZW
 test_LZ78 :: String -> IO ()
 test_LZ78 input = do
     putStrLn $ "LZ78 Compression ratio: " ++ show compressionRatio
-    putStrLn $ "LZ78 Space saving: " ++ show spaceSaving ++ " %"
+    putStrLn $ "LZ78 Space saving: " ++ show (spaceSaving*100) ++ " %"
     putStrLn ""
   where
     output = LZ78.compress input
     inputSize = length input
-    outputSize = length output
+    outputSize =  LZ78.getOutputLength output
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
-    spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
+    spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show LZW performance on the given input
 test_LZW :: String -> IO ()
 test_LZW input = do
     putStrLn $ "LZW Compression ratio: " ++ show compressionRatio
-    putStrLn $ "LZW Space saving: " ++ show spaceSaving ++ " %"
+    putStrLn $ "LZW Space saving: " ++ show (spaceSaving*100) ++ " %"
     putStrLn ""
   where
     output = LZW.compress input
     inputSize = length input
-    outputSize = length output
+    outputSize = LZW.getOutputLength output
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
-    spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
+    spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show RLE performance on the given input
 test_RLE :: String -> IO ()
 test_RLE input = do
     putStrLn $ "RLE Compression ratio: " ++ show compressionRatio
-    putStrLn $ "RLE Space saving: " ++ show spaceSaving ++ " %"
+    putStrLn $ "RLE Space saving: " ++ show (spaceSaving*100) ++ " %"
     putStrLn ""
   where
     output = RLE.compress input
     inputSize = length input
     outputSize = RLE.getOutputLength output
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
-    spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
+    spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show Shannon Fano performance on the given input
 test_ShannonFano :: String -> IO ()
 test_ShannonFano input = do
     putStrLn $ "Shannon Fano Compression ratio: " ++ show compressionRatio
-    putStrLn $ "Shannon Fano Space saving: " ++ show spaceSaving ++ " %"
+    putStrLn $ "Shannon Fano Space saving: " ++ show (spaceSaving*100) ++ " %"
     putStrLn ""
   where
     output = EncodingTree.compress ShannonFano.tree input
     inputSize = length input
     outputSize = length output -- TODO: change to real size
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
-    spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
+    spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
--- | Compute and show Huffman performance on the given input
-{- test_Huffman :: String -> IO ()
+-- | Compute and show Shannon Fano performance on the given input
+test_Huffman :: String -> IO ()
 test_Huffman input = do
-    let frequencies = calculateFrequencies input
-        maybeTree = tree frequencies
-        (maybeTreeAfterCompression, compressedBits) = EncodingTree.compress (const maybeTree) input
-        outputSize = length compressedBits -- Assuming `compressedBits` is a list or similar
-        inputSize = length input * 8 -- Multiply by 8 to convert char length to bit length if input is a string
-        compressionRatio = fromIntegral inputSize / fromIntegral outputSize
-        spaceSaving = 1.0 - fromIntegral outputSize / fromIntegral inputSize
     putStrLn $ "Huffman Compression ratio: " ++ show compressionRatio
-    putStrLn $ "Huffman Space saving: " ++ show spaceSaving ++ " %"
-    putStrLn "" -}
+    putStrLn $ "Huffman Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn ""
+  where
+    output = EncodingTree.compress Huffman.tree input
+    inputSize = length input
+    outputSize = length output -- TODO: change to real size
+    compressionRatio = fromIntegral inputSize / fromIntegral outputSize
+    spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
+
 
 benchmark :: IO ()
 benchmark = do
@@ -94,6 +94,6 @@ benchmark = do
       test_LZW fileContent
       test_RLE fileContent
       test_ShannonFano fileContent
-      -- test_Huffman fileContent
+      test_Huffman fileContent
       putStrLn ""
       testFiles rest

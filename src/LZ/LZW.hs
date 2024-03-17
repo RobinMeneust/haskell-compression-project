@@ -3,7 +3,7 @@
   Description : An implementation of LZW method
   Maintainer  : Jérémy SAELEN
 -}
-module LZ.LZW (compress, uncompress) where
+module LZ.LZW (compress, uncompress, getOutputLength) where
 
 import LZ.Dictionaries
 import Data.Maybe
@@ -71,3 +71,14 @@ uncompressRec (value:encoded) dict acc previousValue
                     then dict ++ [([lastCharacter]++[head character])] 
                     else dict ++ [((dict !! previousValue) ++ [head character])] --  ++ [([lastCharacter]++(character))]
 
+
+-- | Get size of the compressed data in bytes
+getOutputLength :: [Int] -> Int
+getOutputLength compressedData = getOutputLengthRec compressedData 0
+
+-- | Get size of the compressed data in bytes with an accumulator
+getOutputLengthRec :: [Int] -> Int -> Int
+getOutputLengthRec [] acc = acc
+getOutputLengthRec (index:list) acc = getOutputLengthRec list (nbBytesForIndex + 1) -- size dict index + separator between elements
+	where
+		nbBytesForIndex = (div ((floor . logBase 2.0 . fromIntegral) index) 8) + 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value
