@@ -7,14 +7,17 @@
 module Statistic.Huffman (tree) where
 
 import Statistic.EncodingTree (EncodingTree(..))
-import Data.List (sortOn, group, sort)
+import Data.List (sortOn, group, sort, sortBy)
+import Data.Function (on)
+import Statistic.Source(orderedCounts)
 
 data HuffmanTree a = Leaf a Int | Node (HuffmanTree a) (HuffmanTree a) Int deriving (Show)
 
 -- | generation of the huffman tree based on a list of frequencies
-tree :: Ord a => [(a, Int)] -> Maybe (EncodingTree a)
-tree [] = Nothing
-tree xs = Just $ convertToEncodingTree $ buildTree $ map (\(sym, freq) -> Leaf sym freq) xs
+tree :: Ord a => [a] -> Maybe (EncodingTree a)
+tree [] = Nothing  -- Base case: Empty list
+tree symbols = Just $ convertToEncodingTree $ buildTree $ (map (\(sym, freq) -> Leaf sym freq))  $ sortBy (flip compare `on` snd) $ orderedCounts symbols
+
 
 -- | Building the tree
 buildTree :: Ord a => [HuffmanTree a] -> HuffmanTree a
