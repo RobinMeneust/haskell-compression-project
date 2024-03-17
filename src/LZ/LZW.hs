@@ -79,6 +79,6 @@ getOutputLength compressedData = getOutputLengthRec compressedData 0
 -- | Get size of the compressed data in bytes with an accumulator
 getOutputLengthRec :: [Int] -> Int -> Int
 getOutputLengthRec [] acc = acc
-getOutputLengthRec (index:list) acc = getOutputLengthRec list (nbBytesForIndex + 1) -- size dict index + separator between elements
+getOutputLengthRec (index:list) acc = getOutputLengthRec list (acc + nbBytesForIndex) -- size dict index
 	where
-		nbBytesForIndex = (div ((floor . logBase 2.0 . fromIntegral) index) 8) + 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value
+		nbBytesForIndex = if index > 0 then (div (floor (logBase 2.0 (fromIntegral index))) 8) + 1 else 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value

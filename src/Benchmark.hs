@@ -12,6 +12,7 @@ import Statistic.ShannonFano as ShannonFano
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
+import Data.Maybe
 
 -- | Compute and show LZ78 performance on the given input
 test_LZ78 :: String -> IO ()
@@ -55,13 +56,14 @@ test_RLE input = do
 -- | Compute and show Shannon Fano performance on the given input
 test_ShannonFano :: String -> IO ()
 test_ShannonFano input = do
+    -- putStrLn $ "test " ++ show (inputSize) ++ " " ++ show (outputSize) ++ " " ++ show (EncodingTree.getSizeTree (fromJust (fst output)))
     putStrLn $ "Shannon Fano Compression ratio: " ++ show compressionRatio
     putStrLn $ "Shannon Fano Space saving: " ++ show (spaceSaving*100) ++ " %"
     putStrLn ""
   where
     output = EncodingTree.compress ShannonFano.tree input
     inputSize = length input
-    outputSize = length output -- TODO: change to real size
+    outputSize = EncodingTree.getOutputLength output
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
@@ -74,13 +76,14 @@ test_Huffman input = do
   where
     output = EncodingTree.compress Huffman.tree input
     inputSize = length input
-    outputSize = length output -- TODO: change to real size
+    outputSize = EncodingTree.getOutputLength output
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 
 benchmark :: IO ()
 benchmark = do
+    putStrLn ""
     putStrLn "A good compression ratio is big and a good space saving is close to 1. If the space saving is negative then the compression is worse than the original file"
     putStrLn ""
     putStrLn "Starting tests..."

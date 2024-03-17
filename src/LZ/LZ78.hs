@@ -56,7 +56,6 @@ uncompressRec encoded dict acc
         firstChar = snd firstPair
 
 
-
 -- | Get size of the compressed data in bytes
 getOutputLength :: [(Int, Char)] -> Int
 getOutputLength compressedData = getOutputLengthRec compressedData 0
@@ -64,6 +63,6 @@ getOutputLength compressedData = getOutputLengthRec compressedData 0
 -- | Get size of the compressed data in bytes with an accumulator
 getOutputLengthRec :: [(Int, Char)] -> Int -> Int
 getOutputLengthRec [] acc = acc
-getOutputLengthRec ((index,_):list) acc = getOutputLengthRec list (acc + nbBytesForIndex + 2) -- size char + size dict index + separator between tuples (index, char)
+getOutputLengthRec ((index,_):list) acc = getOutputLengthRec list (acc + nbBytesForIndex + 1) -- size char + size dict index
 	where
-		nbBytesForIndex = (div ((floor . logBase 2.0 . fromIntegral) index) 8) + 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value
+		nbBytesForIndex = if index > 0 then (div (floor (logBase 2.0 (fromIntegral index))) 8) + 1 else 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value

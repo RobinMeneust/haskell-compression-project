@@ -3,7 +3,7 @@
   Description : A module representing a binary tree for binary encoding
   Maintainer : Robin Meneust, Mathis TEMPO
 -}
-module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress) where
+module Statistic.EncodingTree(EncodingTree(..), isLeaf, count, has, encode, decodeOnce, decode, meanLength, compress, uncompress, getOutputLength, getSizeTree) where
 
 import Statistic.Bit
 
@@ -97,3 +97,14 @@ compress buildTree symbols =
 uncompress :: (Maybe (EncodingTree a), [Bit]) -> Maybe [a]
 uncompress (Just tree, bits) = decode tree bits
 uncompress (Nothing, _) = Nothing
+
+
+-- | Get the size of the tree
+getSizeTree :: (EncodingTree a) -> Int
+getSizeTree (EncodingLeaf _ _) = 1
+getSizeTree (EncodingNode _ left right) = (getSizeTree left) + (getSizeTree right) + 1
+
+-- | Get size of the compressed data in bytes
+getOutputLength :: (Maybe (EncodingTree a), [Bit]) -> Int
+getOutputLength (Nothing, compressedData) = ((length compressedData) `div` 8) + (if length compressedData `mod` 8 == 0 then 0 else 1)
+getOutputLength (Just tree, compressedData) = ((length compressedData) `div` 8) + (if length compressedData `mod` 8 == 0 then 0 else 1) + (getSizeTree tree)
