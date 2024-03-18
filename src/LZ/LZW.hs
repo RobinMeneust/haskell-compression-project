@@ -59,17 +59,17 @@ uncompressRec :: [Int]  -- ^ Compressed data to be uncompressed
 uncompressRec [] _ acc _ = acc
 
 uncompressRec (value:encoded) dict acc previousValue
-    | isNothing acc || length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = acc -- If it cannot be uncompressed
+    | isNothing acc || length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = Nothing -- If it cannot be uncompressed
     | otherwise = uncompressRec encoded newDict (Just (res ++ character)) value -- If it can be uncompressed
     where
         character = newDict !! value
+        previousCharacter = dict !! previousValue
         res = fromJust acc
-        lastCharacter = last res
         newDict = if length res == 0 
                 then dict 
                 else if value < (length dict) 
-                    then dict ++ [([lastCharacter]++[head character])] 
-                    else dict ++ [((dict !! previousValue) ++ [head character])] --  ++ [([lastCharacter]++(character))]
+                    then dict ++ [(previousCharacter ++ [head character])] 
+                    else dict ++ [(previousCharacter ++ [head previousCharacter])] --  ++ [([lastCharacter]++(character))]
 
 
 -- | Get size of the compressed data in bytes
