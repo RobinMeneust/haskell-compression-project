@@ -3,9 +3,9 @@ module Statistic.HuffmanSpec(runTests) where
 
 import Test.QuickCheck
 import Statistic.Huffman (tree)
-import Statistic.EncodingTree (EncodingTree(..), count)
-import Data.List (nub, sort)
-import Control.Monad (liftM2)
+-- import Statistic.EncodingTree (EncodingTree(..), count)
+-- import Data.List (nub, sort)
+-- import Control.Monad (liftM2)
 import Statistic.EncodingTree
 import Data.Maybe
 
@@ -44,7 +44,7 @@ prop_build_tree_empty_string = isNothing(tree "")
 
 prop_build_tree_single_char_repeat :: Char -> Property
 prop_build_tree_single_char_repeat c =
-	forAll generate_positive_int (\occ -> tree (take occ (repeat c)) == Just (EncodingLeaf occ c))
+    forAll generate_positive_int (\occ -> tree (take occ (repeat c)) == Just (EncodingLeaf occ c))
 
 
 return []

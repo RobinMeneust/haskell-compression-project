@@ -1,7 +1,7 @@
 {- |
   Module : Statistic.Source
   Description : Some utility functions for sources (input messages)
-  Maintainer : ???
+  Maintainer : Nino Hamel, Mathis Tempo
 -}
 
 module Statistic.Source(occurrences, entropy, orderedCounts) where

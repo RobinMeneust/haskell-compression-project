@@ -11,9 +11,9 @@ description:    Please see README.md
 category:       Lossless compression
 homepage:       https://github.com/RobinMeneust/haskell-compression-project#readme
 bug-reports:    https://github.com/RobinMeneust/haskell-compression-project/issues
-author:         Author name here
+author:         Nino Hamel, Robin Meneust, Jérémy Saëlen, Mathis Tempo
 maintainer:     example@example.com
-copyright:      2024 Author name here
+copyright:      2024 Nino Hamel, Robin Meneust, Jérémy Saëlen, Mathis Tempo
 license:        BSD-3-Clause
 license-file:   LICENSE
 build-type:     Simple
@@ -28,7 +28,6 @@ source-repository head
 library
   exposed-modules:
       Benchmark
-      Lib
       LZ.Dictionaries
       LZ.LZ78
       LZ.LZW

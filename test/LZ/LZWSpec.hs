@@ -27,20 +27,20 @@ prop_compress_special_characters = uncompress (compress "\0\5000\123e\a@\\") == 
 
 prop_compress_uncompress :: String -> Property
 prop_compress_uncompress input =
-	length input > 0 && isNothing (find (\c -> ord c > 255) input) ==> isJust output && input == fromJust output
+	length input > 0 && isNothing (find (\c -> ord c > 255) input) ==> isJust compressedData && input == fromJust compressedData
     where
-        output = uncompress (compress input)
+        compressedData = uncompress (compress input)
 
 prop_compress_uncompress_char_repetitions :: Property
 prop_compress_uncompress_char_repetitions =
-	forAll generate_repetitions_char_ascii $ \input -> let output = uncompress (compress input) in isJust output && input == fromJust output
+	forAll generate_repetitions_char_ascii $ \input -> let compressedData = uncompress (compress input) in isJust compressedData && input == fromJust compressedData
 
 prop_compress_uncompress_str_repetitions :: String -> Int -> Property
 prop_compress_uncompress_str_repetitions s nbRepeat =
-	length s > 0 && isNothing (find (\c -> ord c > 255) s) ==> isJust output && input == fromJust output
+	length s > 0 && isNothing (find (\c -> ord c > 255) s) ==> isJust compressedData && input == fromJust compressedData
 	where
 		input = repetitions_str s nbRepeat
-		output = uncompress (compress input)
+		compressedData = uncompress (compress input)
 
 generate_repetitions_char_ascii :: Gen String
 generate_repetitions_char_ascii = listOf (elements ['\0'..'\255'])

@@ -7,7 +7,7 @@
 module Statistic.Huffman (tree) where
 
 import Statistic.EncodingTree (EncodingTree(..))
-import Data.List (sortOn, group, sort, sortBy)
+import Data.List (sortOn, sortBy)
 import Data.Function (on)
 import Statistic.Source(orderedCounts)
 

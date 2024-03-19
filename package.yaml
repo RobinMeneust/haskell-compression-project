@@ -2,9 +2,9 @@ name:                haskell-compression-project
 version:             0.1.0.0
 github:              "RobinMeneust/haskell-compression-project"
 license:             BSD-3-Clause
-author:              "Author name here"
+author:              "Nino Hamel, Robin Meneust, Jérémy Saëlen, Mathis Tempo"
 maintainer:          "example@example.com"
-copyright:           "2024 Author name here"
+copyright:           "2024 Nino Hamel, Robin Meneust, Jérémy Saëlen, Mathis Tempo"
 
 extra-source-files:
 - README.md

@@ -22,20 +22,20 @@ prop_compress_single_char c = compress [c] == [(0,c)] && uncompress (compress [c
 
 prop_compress_uncompress :: String -> Bool
 prop_compress_uncompress input =
-    isJust output && input == fromJust output
+    isJust compressedData && input == fromJust compressedData
     where
-        output = uncompress (compress input)
+        compressedData = uncompress (compress input)
 
 prop_compress_uncompress_char_repetitions :: Char -> Property
 prop_compress_uncompress_char_repetitions c =
-	forAll (repetitions_char_gen c) $ \input -> let output = uncompress (compress input) in isJust output && input == fromJust output
+	forAll (repetitions_char_gen c) $ \input -> let compressedData = uncompress (compress input) in isJust compressedData && input == fromJust compressedData
 
 prop_compress_uncompress_str_repetitions :: String -> Int -> Property
 prop_compress_uncompress_str_repetitions s nbRepeat =
-	length s > 0 ==> isJust output && input == fromJust output
+	length s > 0 ==> isJust compressedData && input == fromJust compressedData
 	where
 		input = repetitions_str s nbRepeat
-		output = uncompress (compress input)
+		compressedData = uncompress (compress input)
 
 repetitions_char_gen :: Char -> Gen String
 repetitions_char_gen c = listOf (elements [c])

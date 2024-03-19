@@ -8,7 +8,7 @@ module LZ.Dictionaries(Dictionary, empty, ascii, zeroAsChar) where
 import Data.Char (chr)
 import Data.List (singleton)
 
--- A dictionary is merely an indexed sequence of string
+-- | A dictionary is merely an indexed sequence of string
 type Dictionary = [String]
 
 -- | The empty dictionary

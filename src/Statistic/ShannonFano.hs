@@ -1,14 +1,12 @@
 {- |
   Module : Statistic.ShannonFano
   Description : A module containing specifics for the Shannon-Fano compression method
-  Maintainer : ???
+  Maintainer : Nino Hamel
 -}
 module Statistic.ShannonFano(tree) where
 
 import Statistic.EncodingTree
-import Statistic.Source
 import Data.List (sortBy)
-import Data.Map(toList)
 import Data.Function (on)
 import Statistic.Source(orderedCounts)
 
@@ -16,17 +14,6 @@ import Statistic.Source(orderedCounts)
 tree :: Ord a => [a] -> Maybe (EncodingTree a)
 tree [] = Nothing  -- Base case: Empty list
 tree symbols = buildTree $ sortBy (flip compare `on` snd) $ orderedCounts symbols
-
--- | Calculate symbol probabilities
--- probabilities :: Ord a => [a] -> [(a, Double)]
--- probabilities symbols = map (\(x, cnt) -> (x, fromIntegral cnt / total)) counts
---   where
---    counts = toList $ occurrences symbols
---    total = fromIntegral $ sum $ map snd counts
-
--- | Sort symbols by their probabilities
--- orderedProbabilities :: Ord a => [a] -> [(a, Double)]
--- orderedProbabilities = sortBy (compare `on` snd) . probabilities
 
 -- | Build Shannon-Fano tree recursively
 buildTree :: Ord a => [(a, Int)] -> Maybe (EncodingTree a)

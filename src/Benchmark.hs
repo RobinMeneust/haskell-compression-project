@@ -3,84 +3,83 @@
   Description : Benchmark to compare the compression algorithms performances
   Maintainer  : Robin Meneust
 -}
-module Benchmark where
 
-import System.IO -- To read files
-import qualified Statistic.EncodingTree as EncodingTree
+module Benchmark(benchmark) where
+
+import Statistic.EncodingTree as EncodingTree
 import Statistic.Huffman as Huffman
 import Statistic.ShannonFano as ShannonFano
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
-import Data.Maybe
+import System.IO -- To read files
 
 -- | Compute and show LZ78 performance on the given input
 test_LZ78 :: String -> IO ()
 test_LZ78 input = do
-    putStrLn $ "LZ78 Compression ratio: " ++ show compressionRatio
-    putStrLn $ "LZ78 Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn $ "LZ78 Compression ratio: " ++ show (compressionRatio :: Float)
+    putStrLn $ "LZ78 Space saving: " ++ show (spaceSaving*100 :: Float) ++ " %"
     putStrLn ""
   where
-    output = LZ78.compress input
+    compressedData = LZ78.compress input
     inputSize = length input
-    outputSize =  LZ78.getOutputLength output
+    outputSize =  LZ78.getOutputLength compressedData
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show LZW performance on the given input
 test_LZW :: String -> IO ()
 test_LZW input = do
-    putStrLn $ "LZW Compression ratio: " ++ show compressionRatio
-    putStrLn $ "LZW Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn $ "LZW Compression ratio: " ++ show (compressionRatio :: Float)
+    putStrLn $ "LZW Space saving: " ++ show (spaceSaving*100 :: Float) ++ " %"
     putStrLn ""
   where
-    output = LZW.compress input
+    compressedData = LZW.compress input
     inputSize = length input
-    outputSize = LZW.getOutputLength output
+    outputSize = LZW.getOutputLength compressedData
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show RLE performance on the given input
 test_RLE :: String -> IO ()
 test_RLE input = do
-    putStrLn $ "RLE Compression ratio: " ++ show compressionRatio
-    putStrLn $ "RLE Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn $ "RLE Compression ratio: " ++ show (compressionRatio :: Float)
+    putStrLn $ "RLE Space saving: " ++ show (spaceSaving*100 :: Float) ++ " %"
     putStrLn ""
   where
-    output = RLE.compress input
+    compressedData = RLE.compress input
     inputSize = length input
-    outputSize = RLE.getOutputLength output
+    outputSize = RLE.getOutputLength compressedData
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
 -- | Compute and show Shannon Fano performance on the given input
 test_ShannonFano :: String -> IO ()
 test_ShannonFano input = do
-    -- putStrLn $ "test " ++ show (inputSize) ++ " " ++ show (outputSize) ++ " " ++ show (EncodingTree.getSizeTree (fromJust (fst output)))
-    putStrLn $ "Shannon Fano Compression ratio: " ++ show compressionRatio
-    putStrLn $ "Shannon Fano Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn $ "Shannon Fano Compression ratio: " ++ show (compressionRatio :: Float)
+    putStrLn $ "Shannon Fano Space saving: " ++ show (spaceSaving*100 :: Float) ++ " %"
     putStrLn ""
   where
-    output = EncodingTree.compress ShannonFano.tree input
+    compressedData = EncodingTree.compress ShannonFano.tree input
     inputSize = length input
-    outputSize = EncodingTree.getOutputLength output
+    outputSize = EncodingTree.getOutputLength compressedData
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
--- | Compute and show Shannon Fano performance on the given input
+-- | Compute and show Huffman performance on the given input
 test_Huffman :: String -> IO ()
 test_Huffman input = do
-    putStrLn $ "Huffman Compression ratio: " ++ show compressionRatio
-    putStrLn $ "Huffman Space saving: " ++ show (spaceSaving*100) ++ " %"
+    putStrLn $ "Huffman Compression ratio: " ++ show (compressionRatio :: Float)
+    putStrLn $ "Huffman Space saving: " ++ show (spaceSaving*100 :: Float) ++ " %"
     putStrLn ""
   where
-    output = EncodingTree.compress Huffman.tree input
+    compressedData = EncodingTree.compress Huffman.tree input
     inputSize = length input
-    outputSize = EncodingTree.getOutputLength output
+    outputSize = EncodingTree.getOutputLength compressedData
     compressionRatio = fromIntegral inputSize / fromIntegral outputSize
     spaceSaving = 1.0 - (fromIntegral outputSize / fromIntegral inputSize)
 
-
+-- | Test the compression algorithms on multiple files and compute the compression ratio to compare them
 benchmark :: IO ()
 benchmark = do
     putStrLn ""
@@ -91,12 +90,14 @@ benchmark = do
   where
     testFiles [] = return ()
     testFiles (file:rest) = do
-      putStrLn $ "---- Test with " ++ file ++ " ----"
-      fileContent <- readFile $ "benchmark_input_files/" ++ file
+      putStrLn $ "---- Test with " ++ file ++ " (it might take some time for large files) ----"
+      fileHandle <- openBinaryFile ("benchmark_input_files/" ++ file) ReadMode
+      fileContent <- hGetContents fileHandle
       test_LZ78 fileContent
       test_LZW fileContent
       test_RLE fileContent
       test_ShannonFano fileContent
       test_Huffman fileContent
       putStrLn ""
+      hClose fileHandle
       testFiles rest

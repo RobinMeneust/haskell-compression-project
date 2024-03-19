@@ -7,7 +7,7 @@ module LZ.LZW (compress, uncompress, getOutputLength) where
 
 import LZ.Dictionaries
 import Data.Maybe
-import Data.List
+import Data.List(findIndex)
 import  Data.Char
 
 -- | LZW compress method
@@ -34,7 +34,7 @@ compressRec "" dict maxStr acc
         previousIndex = findIndex (\x -> x==maxStr) dict
 
 compressRec text dict maxStr acc
-	|isNothing index && isNothing temp = compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [fromJust previousIndex]) -- If it's a character whose value is greater than 255 (not ASCII) and it's the first one
+    |isNothing index && isNothing temp = compressRec (tail text) (dict ++ [newStr]) "" (acc ++ [fromJust previousIndex]) -- If it's a character whose value is greater than 255 (not ASCII) and it's the first one
     |isNothing index = compressRec text (dict ++ [newStr]) "" (acc ++ [fromJust previousIndex]) -- If it's not already in dict we can add it
     |otherwise = compressRec (tail text) dict newStr acc -- If it's in the dict we add the char to the string to be searched in the dict
     where
@@ -80,5 +80,5 @@ getOutputLength compressedData = getOutputLengthRec compressedData 0
 getOutputLengthRec :: [Int] -> Int -> Int
 getOutputLengthRec [] acc = acc
 getOutputLengthRec (index:list) acc = getOutputLengthRec list (acc + nbBytesForIndex) -- size dict index
-	where
-		nbBytesForIndex = if index > 0 then (div (floor (logBase 2.0 (fromIntegral index))) 8) + 1 else 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value
+    where
+        nbBytesForIndex = if index > 0 then (div (floor (logBase 2.0 (fromIntegral index) :: Float)) 8) + 1 else 1 -- e.g if index = 1000 : log2(1000) / 8 + 1 = 2, we need 2 bytes to store this value
