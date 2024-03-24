@@ -14,7 +14,7 @@ import  Data.Char
 compress :: String -> [Int]
 compress text = compressRec (removeSpecialCharacters text "") ascii "" []
 
--- | Since LZW can't handle symbol with a "value" greater than 255 so we need to replace for instance \1000 with the cahracters \ 1 0 0 0
+-- | Since LZW can't handle symbol with a "value" greater than 255 so we need to replace for instance \1000 with the characters \ 1 0 0 0
 removeSpecialCharacters :: String -> String -> String
 removeSpecialCharacters "" acc = acc
 removeSpecialCharacters (c:text) acc
@@ -28,8 +28,8 @@ compressRec :: String   -- ^ Text to be compressed
     -> [Int]            -- ^ Accumulator, it corresponds to the compressed version of the text that has already been read
     -> [Int]            -- ^ Compressed text
 compressRec "" dict maxStr acc
-    | maxStr == "" = acc -- It corresponds to the case where the original text is empty
-    | otherwise = (acc ++ [fromJust previousIndex]) -- It corresponds to the case where it is the end of the text
+    | maxStr == "" = acc -- It corresponds to the case where the original text is empty or there is nothing to be compressed
+    | otherwise = (acc ++ [fromJust previousIndex]) -- It corresponds to the case where it is the end of the text and there are characters that remain to be compressed
     where 
         previousIndex = findIndex (\x -> x==maxStr) dict
 
@@ -59,7 +59,7 @@ uncompressRec :: [Int]  -- ^ Compressed data to be uncompressed
 uncompressRec [] _ acc _ = acc
 
 uncompressRec (value:encoded) dict acc previousValue
-    | isNothing acc || length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = Nothing -- If it cannot be uncompressed
+    | length dict < value || (length dict == value && length (fromJust acc) == 0) || value < 0 = Nothing -- If it cannot be uncompressed
     | otherwise = uncompressRec encoded newDict (Just (res ++ character)) value -- If it can be uncompressed
     where
         character = newDict !! value
@@ -69,7 +69,7 @@ uncompressRec (value:encoded) dict acc previousValue
                 then dict 
                 else if value < (length dict) 
                     then dict ++ [(previousCharacter ++ [head character])] 
-                    else dict ++ [(previousCharacter ++ [head previousCharacter])] --  ++ [([lastCharacter]++(character))]
+                    else dict ++ [(previousCharacter ++ [head previousCharacter])]
 
 
 -- | Get size of the compressed data in bytes
