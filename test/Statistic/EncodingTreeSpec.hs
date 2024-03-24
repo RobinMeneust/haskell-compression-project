@@ -8,63 +8,7 @@ import Statistic.Huffman as Huffman
 import Statistic.ShannonFano as ShannonFano
 import Data.Maybe (isJust, fromJust, isNothing)
 import Statistic.Source(orderedCounts)
-
--- Tests for compress and uncompress
-
-{- 
-instance Arbitrary a => Arbitrary (EncodingTree a) where
-    arbitrary = sized encodingTree
-      where
-        encodingTree 0 = EncodingLeaf <$> arbitrary <*> arbitrary
-        encodingTree n = oneof
-            [ EncodingLeaf <$> arbitrary <*> arbitrary
-            , EncodingNode <$> arbitrary <*> subtree <*> subtree
-            ]
-          where
-            subtree = encodingTree (n `div` 2)
-
--- Property: Encoding a symbol and then decoding it should yield the original symbol
-prop_EncodeDecode :: EncodingTree Char -> Char -> Property
-prop_EncodeDecode tree symbol =
-  let encoded = encode tree symbol
-      decoded = case encoded of
-                  Just bits -> fmap (\[x] -> x) (decode tree bits)  -- Decode a single symbol
-                  Nothing   -> Nothing
-  in Just symbol === decoded
-
--- Property: Encoding a symbol and then decoding it should yield the original symbol
--- when using a tree containing only leaf nodes
-prop_EncodeDecodeLeafTree :: Char -> Property
-prop_EncodeDecodeLeafTree symbol =
-  let tree = EncodingLeaf 1 symbol
-      encoded = encode tree symbol
-      decoded = case encoded of
-                  Just bits -> fmap (\[x] -> x) (decode tree bits)  -- Decode a single symbol
-                  Nothing   -> Nothing
-  in Just symbol === decoded
-
--- Property: Encoding a symbol and then decoding it should yield the original symbol
--- when using a tree containing only one node
-prop_EncodeDecodeSingleNodeTree :: Char -> Property
-prop_EncodeDecodeSingleNodeTree symbol =
-  let tree = EncodingNode 1 (EncodingLeaf 1 symbol) (EncodingLeaf 1 symbol)
-      encoded = encode tree symbol
-      decoded = case encoded of
-                  Just bits -> decodeOnce tree bits  -- Decode a single symbol
-                  Nothing   -> Nothing
-  in Just symbol === fmap fst decoded
-
-
--- Property: The decoding of a list of symbols should result in the same list
-prop_DecodeEncode ::  [Char] -> Bool
-prop_DecodeEncode tree symbols =
-  let encoded = mapM (encode tree) symbols
-      decoded = case encoded of
-                  Just bits -> decode tree (concat bits)  -- Concatenate the list of bits
-                  Nothing   -> Nothing
-  in isNothing decoded || Just symbols == decoded
- -}
-
+import System.IO -- To read files
 
 prop_compress_empty_ShannonFano :: Bool
 prop_compress_empty_ShannonFano =
@@ -80,9 +24,26 @@ prop_compress_single_char_ShannonFano c =
         uncompressedData = uncompress (t, compressedData)
 
 prop_compress_uncompress_ShannonFano :: String -> Property
-prop_compress_uncompress_ShannonFano input = (not . null) input && isJust (ShannonFano.tree (orderedCounts input)) ==>
+prop_compress_uncompress_ShannonFano input = isJust (ShannonFano.tree (orderedCounts input)) ==>
   isJust t && isJust uncompressedData && input == fromJust uncompressedData
         where
+        (t, compressedData) = compress ShannonFano.tree input
+        uncompressedData = uncompress (t, compressedData)
+
+
+prop_compress_uncompress_ShannonFano_small_file :: Property
+prop_compress_uncompress_ShannonFano_small_file = isJust (ShannonFano.tree (orderedCounts input)) ==>
+  isJust t && isJust uncompressedData && input == fromJust uncompressedData
+        where
+        input = "belle echelle !"
+        (t, compressedData) = compress ShannonFano.tree input
+        uncompressedData = uncompress (t, compressedData)
+
+prop_compress_uncompress_ShannonFano_medium_file :: Property
+prop_compress_uncompress_ShannonFano_medium_file = isJust (ShannonFano.tree (orderedCounts input)) ==>
+  isJust t && isJust uncompressedData && input == fromJust uncompressedData
+        where
+        input = "Haskell est un langage de programmation fonctionnel fondé sur le lambda-calcul et la logique combinatoire.\nSon nom vient du mathématicien et logicien Haskell Curry. Il a été créé en 1990 par un comité de chercheurs en théorie des langages intéressés par les langages fonctionnels et l'évaluation paresseuse.\nLe dernier standard est Haskell 2010 : c'est une version minimale et portable du langage conçue à des fins pédagogiques et pratiques, dans un souci d'interopérabilité entre les implémentations du langage et comme base de futures extensions.\nLe langage continue d'évoluer en 2020, principalement avec GHC, constituant ainsi un standard de facto comprenant de nombreuses extensions."
         (t, compressedData) = compress ShannonFano.tree input
         uncompressedData = uncompress (t, compressedData)
 
@@ -101,9 +62,25 @@ prop_compress_single_char_Huffman c =
         uncompressedData = uncompress (t, compressedData)
 
 prop_compress_uncompress_Huffman :: String -> Property
-prop_compress_uncompress_Huffman input = (not . null) input && isJust (Huffman.tree (orderedCounts input)) ==>
+prop_compress_uncompress_Huffman input = isJust (Huffman.tree (orderedCounts input)) ==>
   isJust t && isJust uncompressedData && input == fromJust uncompressedData
         where
+        (t, compressedData) = compress Huffman.tree input
+        uncompressedData = uncompress (t, compressedData)
+
+prop_compress_uncompress_Huffman_small_file :: Property
+prop_compress_uncompress_Huffman_small_file = isJust (Huffman.tree (orderedCounts input)) ==>
+  isJust t && isJust uncompressedData && input == fromJust uncompressedData
+        where
+        input = "belle echelle !"
+        (t, compressedData) = compress Huffman.tree input
+        uncompressedData = uncompress (t, compressedData)
+
+prop_compress_uncompress_Huffman_medium_file :: Property
+prop_compress_uncompress_Huffman_medium_file = isJust (Huffman.tree (orderedCounts input)) ==>
+  isJust t && isJust uncompressedData && input == fromJust uncompressedData
+        where
+        input = "Haskell est un langage de programmation fonctionnel fondé sur le lambda-calcul et la logique combinatoire.\nSon nom vient du mathématicien et logicien Haskell Curry. Il a été créé en 1990 par un comité de chercheurs en théorie des langages intéressés par les langages fonctionnels et l'évaluation paresseuse.\nLe dernier standard est Haskell 2010 : c'est une version minimale et portable du langage conçue à des fins pédagogiques et pratiques, dans un souci d'interopérabilité entre les implémentations du langage et comme base de futures extensions.\nLe langage continue d'évoluer en 2020, principalement avec GHC, constituant ainsi un standard de facto comprenant de nombreuses extensions."
         (t, compressedData) = compress Huffman.tree input
         uncompressedData = uncompress (t, compressedData)
 

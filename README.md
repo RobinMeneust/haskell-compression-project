@@ -8,6 +8,7 @@
 
 - The path of this project must not contain special characters or spaces
 - If stack commands don't work, then use: `sudo` and `--allow-different-user`. e.g. `sudo stack build --allow-different-user`
+- If it still doesn't work, you can also try to delete the folder .stack-work and re-build the project with stack
 
 ## Build
 

@@ -12,6 +12,7 @@ import Statistic.ShannonFano as ShannonFano
 import RLE
 import LZ.LZ78 as LZ78
 import LZ.LZW as LZW
+import Statistic.Source as Source
 import System.IO -- To read files
 
 -- | Compute and show LZ78 performance on the given input
@@ -86,13 +87,14 @@ benchmark = do
     putStrLn "A good compression ratio is big and a good space saving is close to 1. If the space saving is negative then the compression is worse than the original file"
     putStrLn ""
     putStrLn "Starting tests..."
-    testFiles ["repetitions.txt", "small.txt", "medium.txt", "large.txt", "image.png"]
+    testFiles ["repetitions.txt", "small.txt", "medium.txt", "large.txt", "image.png", "patterns.txt", "notUniformCharDistrib.txt", "fewDifferentCharacters.txt"]
   where
     testFiles [] = return ()
     testFiles (file:rest) = do
       putStrLn $ "---- Test with " ++ file ++ " (it might take some time for large files) ----"
       fileHandle <- openBinaryFile ("benchmark_input_files/" ++ file) ReadMode
       fileContent <- hGetContents fileHandle
+      putStrLn $ "Entropy: " ++ (show (Source.entropy fileContent))
       test_LZ78 fileContent
       test_LZW fileContent
       test_RLE fileContent

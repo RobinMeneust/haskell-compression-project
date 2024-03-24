@@ -47,7 +47,6 @@ encodeRec (EncodingNode _ left right) symb acc
     | left `has` symb = encodeRec left symb (acc++[Zero]) 
     | otherwise = encodeRec right symb (acc++[One]) 
 
-
 -- | Computes the first symbol from list of bits using encoding tree and also returns the list of bits still to process
 decodeOnce :: EncodingTree a -> [Bit] -> Maybe (a, [Bit])
 decodeOnce (EncodingLeaf _ b) bits = Just (b, bits)

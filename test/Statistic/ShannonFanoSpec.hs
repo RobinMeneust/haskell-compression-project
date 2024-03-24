@@ -19,14 +19,6 @@ prop_build_tree_single_char_repeat c =
     forAll generate_positive_int (\occ -> tree (take occ (repeat c)) == Just (EncodingLeaf occ c))
 
 
-{- prop_build_tree_single_char_repeat :: Char -> Int -> Bool
-prop_build_tree_single_char_repeat c i =
-    tree (take occ (repeat c)) == Just (EncodingLeaf occ c)
-        where
-        occ = (abs i) + 1
--}
-
-
 return []
 runTests :: IO Bool
 runTests = $quickCheckAll
