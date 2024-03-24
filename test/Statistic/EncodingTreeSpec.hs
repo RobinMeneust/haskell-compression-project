@@ -8,7 +8,6 @@ import Statistic.Huffman as Huffman
 import Statistic.ShannonFano as ShannonFano
 import Data.Maybe (isJust, fromJust, isNothing)
 import Statistic.Source(orderedCounts)
-import System.IO -- To read files
 
 prop_compress_empty_ShannonFano :: Bool
 prop_compress_empty_ShannonFano =
