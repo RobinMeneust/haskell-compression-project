@@ -22,14 +22,14 @@ prop_compress_uncompress input =
 
 prop_compress_uncompress_char_repetitions :: Char -> Property
 prop_compress_uncompress_char_repetitions c =
-	forAll (repetitions_char_gen c) $ \input -> let uncompressedData = uncompress (compress input) in isJust uncompressedData && input == fromJust uncompressedData
+    forAll (repetitions_char_gen c) $ \input -> let uncompressedData = uncompress (compress input) in isJust uncompressedData && input == fromJust uncompressedData
 
 prop_compress_uncompress_str_repetitions :: String -> Int -> Property
 prop_compress_uncompress_str_repetitions s nbRepeat =
-	length s > 0 ==> isJust uncompressedData && input == fromJust uncompressedData
-	where
-		input = repetitions_str s nbRepeat
-		uncompressedData = uncompress (compress input)
+    length s > 0 ==> isJust uncompressedData && input == fromJust uncompressedData
+    where
+        input = repetitions_str s nbRepeat
+        uncompressedData = uncompress (compress input)
 
 repetitions_char_gen :: Char -> Gen String
 repetitions_char_gen c = listOf (elements [c])

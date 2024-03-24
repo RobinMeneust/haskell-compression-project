@@ -13,11 +13,6 @@ import Data.List(findIndex)
 compress :: String -> [(Int, Char)]
 compress text = compressRec text empty "" []
 
--- | LZ78 uncompress method
--- If input cannot be uncompressed, returns `Nothing`
-uncompress :: [(Int, Char)] -> Maybe String
-uncompress encoded = uncompressRec encoded empty (Just "")
-
 -- | LZ78 compress method with accumulator
 compressRec :: String   -- ^ Text to be compressed
     -> Dictionary       -- ^ Dictionary used for the compression
@@ -36,6 +31,11 @@ compressRec text dict maxStr acc
         prevStepIndex = if maxStr == "" then Nothing else findIndex (\x -> x == maxStr) dict
         newIndex = if isNothing prevStepIndex then 0 else fromJust prevStepIndex
 
+-- | LZ78 uncompress method
+-- If input cannot be uncompressed, returns `Nothing`
+uncompress :: [(Int, Char)] -> Maybe String
+uncompress encoded = uncompressRec encoded empty (Just "")
+
 -- | LZ78 uncompress method with accumulator
 -- If input cannot be uncompressed, returns `Nothing`
 uncompressRec :: [(Int, Char)]  -- ^ Compressed data to be uncompressed
@@ -44,7 +44,6 @@ uncompressRec :: [(Int, Char)]  -- ^ Compressed data to be uncompressed
     -> Maybe String             -- ^ Uncompressed data
 uncompressRec [] _ acc = acc
 uncompressRec encoded dict acc
-    | isNothing acc = Nothing
     | firstVal < 0 = Nothing -- Invalid index
     | length dict <= firstVal = Nothing -- (n,x) but the nth entry is not found in the dict
     | firstVal /= 0 = uncompressRec (tail encoded) (dict ++ [(dict !! firstVal) ++ [firstChar]]) (Just ((fromJust acc) ++ (dict !! firstVal) ++ [firstChar])) -- New string
